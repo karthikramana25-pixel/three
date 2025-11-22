@@ -93,7 +93,17 @@ app.get('/transaction/id',(req,res)=>{
         res.json({message:"error retrieving transaction", error: err.message});
     }
 });
-
   app.listen(port, () => {
     console.log(`AB3 backend app listening at http://localhost:${port}`)
   })
+
+const waitForMySQL = require('./wait-for-mysql');
+
+(async () => {
+    await waitForMySQL();
+    // then start express server
+    app.listen(4000, () => {
+        console.log("AB3 backend app listening at http://localhost:4000");
+    });
+})();
+
