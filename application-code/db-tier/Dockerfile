@@ -1,4 +1,4 @@
-FROM mysql:8
+FROM mysql:5.7
 
 # MySQL root password & database
 ENV MYSQL_ROOT_PASSWORD=admin123
