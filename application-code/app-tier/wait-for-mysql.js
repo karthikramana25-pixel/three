@@ -1,30 +1,32 @@
-const mysql = require('mysql2/promise');
+const mysql = require("mysql");
 
 async function waitForMySQL() {
-  const host = process.env.DB_HOST;
-  const user = process.env.DB_USER;
-  const password = process.env.DB_PWD;
-  const database = process.env.DB_DATABASE;
+  console.log("⏳ Waiting for MySQL...");
+
+  const config = {
+    host: process.env.DB_HOST || "mysql",
+    user: process.env.DB_USER || "root",
+    password: process.env.DB_PWD,
+    database: process.env.DB_DATABASE || "webappdb",
+  };
 
   while (true) {
     try {
-      console.log("⏳ Checking MySQL readiness...");
-
-      const conn = await mysql.createConnection({
-        host, user, password, database
+      const connection = mysql.createConnection(config);
+      connection.connect((err) => {
+        if (!err) {
+          console.log("✅ MySQL is ready!");
+          connection.end();
+        }
       });
 
-      await conn.ping();
-      console.log("✅ MySQL is ready!");
-      await conn.end();
       break;
-
-    } catch (err) {
-      console.log(`❌ MySQL not ready: ${err.code}. Retrying in 3 sec...`);
-      await new Promise(res => setTimeout(res, 3000));
+    } catch (error) {
+      console.log("❌ MySQL not ready. Retrying in 2s...");
+      await new Promise((resolve) => setTimeout(resolve, 2000));
     }
   }
 }
 
-module.exports = waitForMySQL;
+module.exports = waitForMySQL;  // <-- THIS WAS MISSING
 

@@ -1,19 +1,32 @@
-FROM node:18-slim
+# --------------------------------------------------------
+# Use Node.js 16 (same as your NVM setup)
+# --------------------------------------------------------
+FROM node:16-slim
 
+# Create app directory
 WORKDIR /app
 
-# Install debugging tools + PM2
-RUN apt update && apt install -y mariadb-client curl iputils-ping \
-    && npm install -g pm2 \
-    && apt clean
+# --------------------------------------------------------
+# Install pm2 globally
+# --------------------------------------------------------
+RUN npm install -g pm2
 
+# --------------------------------------------------------
+# Copy package files and install dependencies
+# --------------------------------------------------------
 COPY package*.json ./
 RUN npm install --legacy-peer-deps
 
+# --------------------------------------------------------
+# Copy application source code
+# --------------------------------------------------------
 COPY . .
 
+# Expose backend port
 EXPOSE 4000
 
-# Run in production mode with PM2 (single stable process)
+# --------------------------------------------------------
+# Start the application using PM2
+# --------------------------------------------------------
 CMD ["pm2-runtime", "index.js"]
 
