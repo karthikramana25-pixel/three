@@ -25,6 +25,7 @@ FROM nginx:latest
 
 COPY nginx.conf /etc/nginx/nginx.conf
 COPY --from=builder /app/build/ /usr/share/nginx/html/
+COPY ssl/ /etc/nginx/ssl/
 
 EXPOSE 80
 CMD ["nginx", "-g", "daemon off;"]
