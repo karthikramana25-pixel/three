@@ -1,3 +1,5 @@
+const userService = require('./UserService');
+const jwt = require('jsonwebtoken');
 const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
@@ -32,6 +34,41 @@ app.post('/transaction', (req, res) => {
     } catch (err) {
         return res.json({ message: 'something went wrong', error: err.message });
     }
+});
+// =======================================================
+// USER REGISTRATION
+// =======================================================
+app.post('/register', async (req, res) => {
+    const { username, password } = req.body;
+
+    try {
+        await userService.register(username, password);
+        res.json({ message: "User registered successfully" });
+    } catch (err) {
+        res.status(400).json({ error: "User already exists or DB error", details: err.message });
+    }
+});
+
+// =======================================================
+// USER LOGIN
+// =======================================================
+app.post('/login', async (req, res) => {
+    const { username, password } = req.body;
+
+    const user = await userService.login(username, password);
+
+    if (!user) {
+        return res.status(401).json({ error: "Invalid username or password" });
+    }
+
+    // JWT token
+    const token = jwt.sign(
+        { id: user.id, username: user.username },
+        process.env.JWT_SECRET || "mysecret",
+        { expiresIn: "1h" }
+    );
+
+    res.json({ token });
 });
 
 // =======================================================
