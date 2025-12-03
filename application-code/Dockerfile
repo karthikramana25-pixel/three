@@ -1,32 +1,30 @@
-FROM node:16 AS builder
+# ---------- Build Stage ----------
+FROM node:18 AS builder
 
 WORKDIR /app
 
-# Copy only dependencies first
-COPY web-tier/package.json ./
+# Copy package.json first
+COPY package*.json ./
 
-# Install dependencies normally
+# Install dependencies (inside Docker, faster & cached)
 RUN npm install --legacy-peer-deps
 
-# 🔥 Fix: Install required ajv packages manually (React-Scripts bug)
-RUN npm install ajv@6 ajv-keywords@3 --legacy-peer-deps
+# Copy the rest of the code
+COPY . .
 
-# Copy rest of the code
-COPY web-tier/ .
-
-# Build React app
+# Build the React app
 RUN npm run build
 
-
-# ------------------------
-# Stage 2: Nginx Runtime
-# ------------------------
+# ---------- Nginx Serve Stage ----------
 FROM nginx:latest
 
-COPY nginx.conf /etc/nginx/nginx.conf
-COPY --from=builder /app/build/ /usr/share/nginx/html/
-COPY ssl/ /etc/nginx/ssl/
+COPY --from=builder /app/build /usr/share/nginx/html
+
+# Optional: If you have SSL, copy certs
+# COPY cert.crt /etc/nginx/certs/
+# COPY cert.key /etc/nginx/certs/
 
 EXPOSE 80
+
 CMD ["nginx", "-g", "daemon off;"]
 
