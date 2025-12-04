@@ -3,30 +3,37 @@ FROM node:16 AS builder
 
 WORKDIR /app
 
-# Copy package.json
-COPY package.json ./
+# Copy only package files (NPM install cached)
+COPY package*.json ./
 
-# Install dependencies
+# Install deps
 RUN npm install --legacy-peer-deps
 
-# React-Scripts fix
+# Fix for react-scripts ajv bug
 RUN npm install ajv@6 ajv-keywords@3 --legacy-peer-deps
 
-# Copy all frontend source code
+# Copy the entire project
 COPY . .
 
 # Build React app
 RUN npm run build
 
 
-
 # ---------- Stage 2: Nginx ----------
 FROM nginx:latest
 
-# Copy nginx configuration
+# Copy custom nginx config
 COPY nginx.conf /etc/nginx/nginx.conf
 
-# Copy built frontend
+# Create proxy_params file
+RUN printf "proxy_set_header Host \$host;\n\
+proxy_set_header X-Real-IP \$remote_addr;\n\
+proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;\n\
+proxy_set_header X-Forwarded-Proto \$scheme;\n\
+proxy_http_version 1.1;\n\
+proxy_set_header Connection \"\";\n" > /etc/nginx/proxy_params
+
+# Copy build output
 COPY --from=builder /app/build /usr/share/nginx/html/
 
 # Copy SSL certificates

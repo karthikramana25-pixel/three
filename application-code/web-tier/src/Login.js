@@ -9,7 +9,7 @@ function Login() {
   const loginUser = async () => {
     try {
       const res = await axios.post(
-        "http://52.91.53.162:30040/login",
+        "/login",   // ← No backend IP, clean & production-friendly
         { username, password }
       );
       setMsg("Login successful! Token: " + res.data.token);
