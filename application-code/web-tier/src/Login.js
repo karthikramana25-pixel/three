@@ -1,38 +1,47 @@
 import React, { useState } from "react";
 import axios from "axios";
+import { saveToken } from "./helpers/auth";
+import { useNavigate } from "react-router-dom";
 
 function Login() {
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
+  const [u, setU] = useState("");
+  const [p, setP] = useState("");
   const [msg, setMsg] = useState("");
+  const nav = useNavigate();
 
   const loginUser = async () => {
     try {
-      const res = await axios.post(
-        "/login",   // ← No backend IP, clean & production-friendly
-        { username, password }
-      );
-      setMsg("Login successful! Token: " + res.data.token);
-    } catch (e) {
+      const res = await axios.post("/api/login", {
+        username: u,
+        password: p,
+      });
+
+      // Save token to localStorage
+      saveToken(res.data.token);
+
+      // Redirect to dashboard
+      nav("/dashboard");
+    } catch (err) {
       setMsg("Invalid username or password");
     }
   };
 
   return (
-    <div style={{ padding: 20 }}>
+    <div style={{ padding: 30 }}>
       <h2>Login</h2>
 
       <input
-        type="text"
         placeholder="Username"
-        onChange={(e) => setUsername(e.target.value)}
-      /><br/><br/>
+        onChange={(e) => setU(e.target.value)}
+      />
+      <br /><br />
 
       <input
         type="password"
         placeholder="Password"
-        onChange={(e) => setPassword(e.target.value)}
-      /><br/><br/>
+        onChange={(e) => setP(e.target.value)}
+      />
+      <br /><br />
 
       <button onClick={loginUser}>Login</button>
 

@@ -1,15 +1,16 @@
-import React, { useState, useRef } from 'react';
-import { ThemeProvider } from 'styled-components';
-import { useOnClickOutside } from './hooks';
-import { GlobalStyles } from './global';
-import { theme } from './theme';
-import { Burger, Menu } from './components';
-import FocusLock from 'react-focus-lock';
+import React, { useState, useRef } from "react";
+import { ThemeProvider } from "styled-components";
+import { useOnClickOutside } from "./hooks";
+import { GlobalStyles } from "./global";
+import { theme } from "./theme";
+import { Burger, Menu } from "./components";
+import FocusLock from "react-focus-lock";
 
-import DatabaseDemo from './components/DatabaseDemo/DatabaseDemo';
-import Home from './components/Home/Home';
+import Home from "./Home";
 import Register from "./Register";
 import Login from "./Login";
+import Dashboard from "./Dashboard";
+import ProtectedRoute from "./ProtectedRoute";
 
 import { HashRouter as Router, Routes, Route } from "react-router-dom";
 
@@ -18,6 +19,7 @@ function App() {
   const node = useRef();
   const menuId = "main-menu";
 
+  // Close menu when clicking outside
   useOnClickOutside(node, () => setOpen(false));
 
   return (
@@ -26,16 +28,27 @@ function App() {
 
       <div ref={node}>
         <FocusLock disabled={!open}>
+          {/* Hamburger menu */}
           <Burger open={open} setOpen={setOpen} aria-controls={menuId} />
 
           <Router>
             <Menu open={open} setOpen={setOpen} id={menuId} />
 
             <Routes>
+              {/* PUBLIC ROUTES */}
               <Route path="/" element={<Home />} />
               <Route path="/register" element={<Register />} />
-              <Route path="/db" element={<DatabaseDemo />} />
-	      <Route path="/login" element={<Login />} />
+              <Route path="/login" element={<Login />} />
+
+              {/* PROTECTED ROUTE */}
+              <Route
+                path="/dashboard"
+                element={
+                  <ProtectedRoute>
+                    <Dashboard />
+                  </ProtectedRoute>
+                }
+              />
             </Routes>
           </Router>
         </FocusLock>

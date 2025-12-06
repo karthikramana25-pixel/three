@@ -2,31 +2,33 @@ import React, { useState } from "react";
 import axios from "axios";
 
 function Register() {
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
+  const [u, setU] = useState("");
+  const [p, setP] = useState("");
+  const [msg, setMsg] = useState("");
 
   const registerUser = async () => {
-    const res = await axios.post("/register", {
-      username,
-      password,
-    });
-    alert("User registered!");
+    try {
+      await axios.post("/api/register", { username: u, password: p });
+      setMsg("Registration success! Please login.");
+    } catch {
+      setMsg("User already exists.");
+    }
   };
 
   return (
-    <div style={{ padding: 20 }}>
+    <div style={{ padding: 30 }}>
       <h2>Register</h2>
-      <input
-        type="text"
-        placeholder="Username"
-        onChange={(e) => setUsername(e.target.value)}
-      /><br/>
-      <input
-        type="password"
-        placeholder="Password"
-        onChange={(e) => setPassword(e.target.value)}
-      /><br/>
+
+      <input placeholder="Username" onChange={(e) => setU(e.target.value)} />
+      <br /><br />
+
+      <input type="password" placeholder="Password"
+        onChange={(e) => setP(e.target.value)} />
+      <br /><br />
+
       <button onClick={registerUser}>Register</button>
+
+      <p>{msg}</p>
     </div>
   );
 }
