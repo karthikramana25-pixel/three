@@ -33,7 +33,7 @@ services:
       - three-tier-net
 
   frontend:
-    image: karthik26/react-web-app:v25
+    image: karthik26/react-web-app:v27
     container_name: frontend-app
     depends_on:
       - backend

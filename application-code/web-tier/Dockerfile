@@ -1,37 +1,33 @@
 # ---------- Stage 1: Build React ----------
-FROM node:16-alpine AS builder
+FROM node:18 AS builder
 
 WORKDIR /app
 
-# Copy ONLY package.json (you don’t have package-lock.json)
-COPY package.json ./
+# Copy package files
+COPY package.json package-lock.json ./
 
-# Install dependencies
+# Install all dependencies normally
 RUN npm install --legacy-peer-deps
 
-# Fix react-scripts ajv bug
+# Force React Scripts compatible AJV version
 RUN npm install ajv@6 ajv-keywords@3 --legacy-peer-deps
 
-# Copy full project
+# Copy full source code
 COPY . .
 
-# Build React app
-RUN npm run build
+# Build React
+RUN npx react-scripts build
 
 
 # ---------- Stage 2: Nginx ----------
-FROM nginx:stable-alpine
+FROM nginx:latest
 
-# Copy Nginx config
 COPY nginx.conf /etc/nginx/nginx.conf
 
-# Copy SSL certs
+COPY --from=builder /app/build /usr/share/nginx/html/
+
 COPY ssl/ /etc/nginx/ssl/
 
-# Copy frontend build
-COPY --from=builder /app/build/ /usr/share/nginx/html/
-
-# Create proxy_params file
 RUN printf "proxy_set_header Host \$host;\n\
 proxy_set_header X-Real-IP \$remote_addr;\n\
 proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;\n\

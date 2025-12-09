@@ -1,34 +1,58 @@
 import React, { useState } from "react";
 import axios from "axios";
+import "./ui.css";
+import { useNavigate } from "react-router-dom";
 
 function Register() {
   const [u, setU] = useState("");
   const [p, setP] = useState("");
   const [msg, setMsg] = useState("");
+  const nav = useNavigate();
 
   const registerUser = async () => {
     try {
       await axios.post("/api/register", { username: u, password: p });
-      setMsg("Registration success! Please login.");
+      setMsg("✅ Registration successful! Redirecting to login...");
+      setTimeout(() => nav("/"), 1200);
     } catch {
-      setMsg("User already exists.");
+      setMsg("❌ User already exists");
     }
   };
 
   return (
-    <div style={{ padding: 30 }}>
-      <h2>Register</h2>
+    <div className="page-wrapper">
+      <div className="card">
+        <h2>Create Account</h2>
 
-      <input placeholder="Username" onChange={(e) => setU(e.target.value)} />
-      <br /><br />
+        <input
+          className="input-box"
+          placeholder="Choose Username"
+          onChange={(e) => setU(e.target.value)}
+        />
 
-      <input type="password" placeholder="Password"
-        onChange={(e) => setP(e.target.value)} />
-      <br /><br />
+        <input
+          className="input-box"
+          type="password"
+          placeholder="Choose Password"
+          onChange={(e) => setP(e.target.value)}
+        />
 
-      <button onClick={registerUser}>Register</button>
+        <button className="btn" onClick={registerUser}>
+          Register
+        </button>
 
-      <p>{msg}</p>
+        {msg && <p style={{ marginTop: "10px" }}>{msg}</p>}
+
+        <p style={{ marginTop: "15px" }}>
+          Already registered?{" "}
+          <span
+            style={{ color: "#007bff", cursor: "pointer" }}
+            onClick={() => nav("/")}
+          >
+            Login here
+          </span>
+        </p>
+      </div>
     </div>
   );
 }
