@@ -1,8 +1,13 @@
+// ==========================
+// App.js (Final Working Version)
+// ==========================
+
 import React, { useState, useRef } from "react";
 import { ThemeProvider } from "styled-components";
 import { useOnClickOutside } from "./hooks";
 import { GlobalStyles } from "./global";
 import { theme } from "./theme";
+
 import { Burger, Menu } from "./components";
 import FocusLock from "react-focus-lock";
 
@@ -12,6 +17,10 @@ import Login from "./Login";
 import Dashboard from "./Dashboard";
 import ProtectedRoute from "./ProtectedRoute";
 
+// NEW — DB Page
+import DatabaseDemo from "./components/DatabaseDemo/DatabaseDemo";
+
+// HashRouter works perfectly with Nginx + Kubernetes + HTTPS
 import { HashRouter as Router, Routes, Route } from "react-router-dom";
 
 function App() {
@@ -19,7 +28,7 @@ function App() {
   const node = useRef();
   const menuId = "main-menu";
 
-  // Close menu when clicking outside
+  // Close burger menu when clicking outside
   useOnClickOutside(node, () => setOpen(false));
 
   return (
@@ -28,10 +37,12 @@ function App() {
 
       <div ref={node}>
         <FocusLock disabled={!open}>
-          {/* Hamburger menu */}
+
+          {/* Hamburger Menu */}
           <Burger open={open} setOpen={setOpen} aria-controls={menuId} />
 
           <Router>
+            {/* Side Menu */}
             <Menu open={open} setOpen={setOpen} id={menuId} />
 
             <Routes>
@@ -40,7 +51,10 @@ function App() {
               <Route path="/register" element={<Register />} />
               <Route path="/login" element={<Login />} />
 
-              {/* PROTECTED ROUTE */}
+              {/* DATABASE DEMO PAGE */}
+              <Route path="/db" element={<DatabaseDemo />} />
+
+              {/* PROTECTED ROUTES */}
               <Route
                 path="/dashboard"
                 element={
@@ -51,6 +65,7 @@ function App() {
               />
             </Routes>
           </Router>
+
         </FocusLock>
       </div>
     </ThemeProvider>
