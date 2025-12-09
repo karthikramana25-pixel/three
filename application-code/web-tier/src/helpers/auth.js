@@ -1,17 +1,12 @@
-// src/helpers/auth.js
-export function saveToken(token) {
+export const saveToken = (token) => {
   localStorage.setItem("token", token);
-}
+};
 
-export function getToken() {
+export const getToken = () => {
   return localStorage.getItem("token");
-}
+};
 
-export function isLoggedIn() {
-  return !!localStorage.getItem("token");
-}
-
-export function logout() {
+export const logout = () => {
   localStorage.removeItem("token");
-}
+};
 
