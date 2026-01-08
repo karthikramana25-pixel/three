@@ -18,3 +18,4 @@ CREATE TABLE IF NOT EXISTS users (
   PRIMARY KEY (id)
 );
 
+INSERT INTO transactions (amount,description) VALUES ('400','groceries');
