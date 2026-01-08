@@ -31,8 +31,8 @@ jobs:
           context: ./web-tier
           push: true
           tags: |
-            ${{ secrets.DOCKERHUB_USERNAME }}/web-tier:latest
-            ${{ secrets.DOCKERHUB_USERNAME }}/web-tier:${{ github.sha }}
+            ${{ secrets.DOCKERHUB_USERNAME }}/application-code/web-tier:latest
+            ${{ secrets.DOCKERHUB_USERNAME }}/application-code/web-tier:${{ github.sha }}
 
       # -----------------------------
       # Build & Push APP-TIER
@@ -43,8 +43,8 @@ jobs:
           context: ./app-tier
           push: true
           tags: |
-            ${{ secrets.DOCKERHUB_USERNAME }}/app-tier:latest
-            ${{ secrets.DOCKERHUB_USERNAME }}/app-tier:${{ github.sha }}
+            ${{ secrets.DOCKERHUB_USERNAME }}/application-code/app-tier:latest
+            ${{ secrets.DOCKERHUB_USERNAME }}/application-code/app-tier:${{ github.sha }}
 
       # -----------------------------
       # Build & Push DB-TIER
@@ -55,5 +55,5 @@ jobs:
           context: ./db-tier
           push: true
           tags: |
-            ${{ secrets.DOCKERHUB_USERNAME }}/db-tier:latest
-            ${{ secrets.DOCKERHUB_USERNAME }}/db-tier:${{ github.sha }}
+            ${{ secrets.DOCKERHUB_USERNAME }}/application-code/db-tier:latest
+            ${{ secrets.DOCKERHUB_USERNAME }}/application-code/db-tier:${{ github.sha }}
