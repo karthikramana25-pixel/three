@@ -4,56 +4,70 @@ on:
   push:
     branches:
       - release1
-  workflow_dispatch:
 
 jobs:
-  build-and-push:
+  docker:
     runs-on: ubuntu-latest
 
     steps:
-      # Checkout code
+      # 1️⃣ Checkout code
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # Login to Docker Hub
+      # 2️⃣ Debug paths (keep this first time)
+      - name: Verify folder structure
+        run: |
+          pwd
+          ls -la
+          ls -la application-code
+          ls -la application-code/web-tier
+
+      # 3️⃣ Login to Docker Hub
       - name: Login to Docker Hub
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      # -----------------------------
-      # Build & Push WEB-TIER
-      # -----------------------------
-      - name: Build & Push Web Tier Image
-        uses: docker/build-push-action@v5
-        with:
-          context: ./web-tier
-          push: true
-          tags: |
-            ${{ secrets.DOCKERHUB_USERNAME }}/application-code/web-tier:latest
-            ${{ secrets.DOCKERHUB_USERNAME }}/application-code/web-tier:${{ github.sha }}
+      # 4️⃣ Setup Docker Buildx
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
 
-      # -----------------------------
-      # Build & Push APP-TIER
-      # -----------------------------
-      - name: Build & Push App Tier Image
+      # =========================
+      # WEB TIER
+      # =========================
+      - name: Build & Push Web Tier
         uses: docker/build-push-action@v5
         with:
-          context: ./app-tier
+          context: ./application-code/web-tier
+          file: ./application-code/web-tier/Dockerfile
           push: true
           tags: |
-            ${{ secrets.DOCKERHUB_USERNAME }}/application-code/app-tier:latest
-            ${{ secrets.DOCKERHUB_USERNAME }}/application-code/app-tier:${{ github.sha }}
+            ${{ secrets.DOCKERHUB_USERNAME }}/web-tier:latest
+            ${{ secrets.DOCKERHUB_USERNAME }}/web-tier:${{ github.sha }}
 
-      # -----------------------------
-      # Build & Push DB-TIER
-      # -----------------------------
-      - name: Build & Push DB Tier Image
+      # =========================
+      # APP TIER
+      # =========================
+      - name: Build & Push App Tier
         uses: docker/build-push-action@v5
         with:
-          context: ./db-tier
+          context: ./application-code/app-tier
+          file: ./application-code/app-tier/Dockerfile
           push: true
           tags: |
-            ${{ secrets.DOCKERHUB_USERNAME }}/application-code/db-tier:latest
-            ${{ secrets.DOCKERHUB_USERNAME }}/application-code/db-tier:${{ github.sha }}
+            ${{ secrets.DOCKERHUB_USERNAME }}/app-tier:latest
+            ${{ secrets.DOCKERHUB_USERNAME }}/app-tier:${{ github.sha }}
+
+      # =========================
+      # DB TIER
+      # =========================
+      - name: Build & Push DB Tier
+        uses: docker/build-push-action@v5
+        with:
+          context: ./application-code/db-tier
+          file: ./application-code/db-tier/Dockerfile
+          push: true
+          tags: |
+            ${{ secrets.DOCKERHUB_USERNAME }}/db-tier:latest
+            ${{ secrets.DOCKERHUB_USERNAME }}/db-tier:${{ github.sha }}
